@@ -8,7 +8,7 @@ Created on Thu Aug 26 09:23:41 2021
 import numpy as np
 
 
-dicti = {'dev/abjxc.wav':1,'dev/ioasm.wav':3, 'dev/zidwg.wav':7}
+dicti = {'dev/si1027.wav':1}
 
 
 np.save('voxconverse_labels',dicti)
