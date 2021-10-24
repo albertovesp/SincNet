@@ -20,11 +20,15 @@ from data_io import ReadList,read_conf_inp,str_to_bool
 import sys
 
 # Model to use for computing the d-vectors
-model_file='/home/mirco/sincnet_models/SincNet_TIMIT/model_raw.pkl' # This is the model to use for computing the d-vectors (it should be pre-trained using the speaker-id DNN)
-cfg_file='/home/mirco/SincNet/cfg/SincNet_TIMIT.cfg' # Config file of the speaker-id experiment used to generate the model
-te_lst='data_lists/TIMIT_test.scp' # List of the wav files to process
-out_dict_file='d_vect_timit.npy' # output dictionary containing the a sentence id as key as the d-vector as value
-data_folder='/home/mirco/Dataset/TIMIT_norm_nosil'
+model_file='/ciiia/home/ciiiau3/SincNet-alberto/exp/SincNet_TIMIT/model_raw.pkl' # This is the model to use for computing the d-vectors (it should be pre-trained using the speaker-id DNN)
+cfg_file='/ciiia/home/ciiiau3/SincNet-alberto/cfg/SincNet_voxconverse.cfg' # Config file of the speaker-id experiment used to generate the model
+
+#te_lst='/ciiia/home/ciiiau3/database/voxconverse-segmented/wav.scp' # List of the wav files to process
+#out_dict_file='/ciiia/home/ciiiau3/database/voxconverse-segmented' # output dictionary containing the a sentence id as key as the d-vector as value
+#data_folder='/ciiia/home/ciiiau3/database/voxconverse-normalized'
+
+te_lst=sys.argv[1]
+out_dict_file=sys.argv[2]
 
 avoid_small_en_fr=True
 energy_th = 0.1  # Avoid frames with an energy that is 1/10 over the average energy
@@ -167,12 +171,12 @@ d_vect_dict={}
 with torch.no_grad(): 
     
     for i in range(snt_te):
-           
-         [signal, fs] = sf.read(data_folder+'/'+wav_lst_te[i])
+         # [signal, fs] = sf.read(data_folder+'/'+wav_lst_te[i])  
+         [signal, fs] = sf.read(wav_lst_te[i])
          
          # Amplitude normalization
-         signal=signal/np.max(np.abs(signal))
-        
+      #   signal=signal/np.max(np.abs(signal))
+         signal=signal/np.linalg.norm(signal)
          signal=torch.from_numpy(signal).float().to(device).contiguous()
         
          if avoid_small_en_fr: 
@@ -200,7 +204,8 @@ with torch.no_grad():
     
              if n_vect_elem<10:
                  print('only few elements used to compute d-vectors')
-                 sys.exit(0)
+                 continue 
+                 #sys.exit(0)
 
 
 
@@ -209,6 +214,7 @@ with torch.no_grad():
          end_samp=wlen
          
          N_fr=int((signal.shape[0]-wlen)/(wshift))
+         #N_fr=int(abs((signal.shape[0]-wlen)/(wshift)))
          
         
          sig_arr=torch.zeros([Batch_dev,wlen]).float().to(device).contiguous()
@@ -240,9 +246,9 @@ with torch.no_grad():
          # checks for nan
          nan_sum=torch.sum(torch.isnan(d_vect_out))
 
-         if nan_sum>0:
-             print(wav_lst_te[i])
-             sys.exit(0)
+         #if nan_sum>0:
+         #    print(wav_lst_te[i])
+         #    sys.exit(0)
 
          
          # saving the d-vector in a numpy dictionary

@@ -170,8 +170,9 @@ CNN_net=CNN(CNN_arch)
 CNN_net.cuda()
 
 # Loading label dictionary
-lab_dict=np.load(class_dict_file).item()
-
+print('ok')
+lab_dict=np.load(class_dict_file,allow_pickle=True).item()
+print('ok2')
 
 
 DNN1_arch = {'input_dim': CNN_net.out_dim,

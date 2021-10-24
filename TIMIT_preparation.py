@@ -74,7 +74,8 @@ for i in range(len(list_sig)):
  
  # Save normalized speech
  file_out=out_folder+'/'+list_sig[i]
-
+ print('AQUIIIIMERO')
+ print(file_out)
  sf.write(file_out, signal, fs)
  
  print("Done %s" % (file_out))

@@ -70,8 +70,8 @@ for i in range(len(list_sig)):
   # Open the wav file
   wav_file=list_sig[i]
   duration= sox.file_info.duration(wav_file)
-  segment = duration//5
-  for j in range(0,4):
+  segment = duration//20
+  for j in range(0,19):
     tfm = sox.Transformer()
     tfm.trim(j*segment, segment*(j+1))
     wav_str = "{}\n".format(out_folder+"/"+name_list[i]+'_'+str(j)+'.wav')
@@ -79,10 +79,10 @@ for i in range(len(list_sig)):
     tfm.build_file(wav_file,out_folder+'/'+name_list[i]+'_'+str(j)+'.wav')
  
   tfm = sox.Transformer()
-  tfm.trim(4*segment, duration)
-  wav_str = "{}\n".format(out_folder+"/"+name_list[i]+'_4.wav')
+  tfm.trim(19*segment, duration)
+  wav_str = "{}\n".format(out_folder+"/"+name_list[i]+'_19.wav')
   wav_f.write(wav_str)
-  tfm.build_file(wav_file,out_folder+'/'+name_list[i]+'_4.wav')
+  tfm.build_file(wav_file,out_folder+'/'+name_list[i]+'_19.wav')
 wav_f.close()
 
 new_list = ReadNewList(out_wav+'/wav.scp')
