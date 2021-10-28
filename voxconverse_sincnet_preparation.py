@@ -38,7 +38,7 @@ def get_args():
   parser = argparse.ArgumentParser(description = '')
   parser.add_argument('segments_file', type = str, help = 'segments file')
   parser.add_argument('wav_path', type = str, help = 'Path to wav files')
-  parser.add_argument('output_list', type = str, help = 'Output path to new wav.scp')
+  parser.add_argument('output_list', type = str, help = 'Output path')
   args = parser.parse_args()
   return args
 
@@ -50,8 +50,6 @@ def main():
     sys.exit(args.segments_file + ' not found or is not file or ' + args.wav_path + " not found")
 
 
-  if not os.path.exists(args.output_folder):
-    os.makedirs(args.output_folder)
   if not os.path.exists(args.output_list):
     os.makedirs(args.output_list)
   # read the segments file
@@ -82,7 +80,7 @@ def main():
   wav_f.close()
 
   #save dictionary
-  np.save(args.output_list + 'overlapped_dict.npy',overlapped_dict)
+  np.save(args.output_list + '/overlapped_dict.npy',overlapped_dict)
   
 if __name__ == '__main__':
   main()
