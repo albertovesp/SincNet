@@ -157,15 +157,19 @@ test_flag = 1
 d_vector_dim = fc_lay[-1]
 d_vect_dict = {}
 
+#Open overlapped timestamps
+overlapped_dict = np.load(overlap_dict,allow_pickle=True)
+overlapped_dict = overlapped_dict.tolist()
 with torch.no_grad():
     for i in range(snt_te):
-        key = wav_lst_te[i][:-4]
+        key = wav_lst_te[i][-9:-4]
 
         #for reference
-        print(key,wav_lst_te[i])
 
         [signal, fs] = sf.read(wav_lst_te[i])
-
+        
+        print(key,len(overlapped_dict[key]))
+       
         # Amplitude normalization
         #   signal=signal/np.max(np.abs(signal))
         signal = signal / np.linalg.norm(signal)
