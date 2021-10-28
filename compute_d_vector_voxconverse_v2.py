@@ -30,7 +30,7 @@ cfg_file = '/ciiia/home/ciiiau3/SincNet-alberto/cfg/SincNet_voxconverse.cfg'
 te_lst = sys.argv[1]
 out_dict_file = sys.argv[2]
 overlap_dict = sys.argv[3]
-
+output_folder =  sys.argv[4]
 
 avoid_small_en_fr = True
 energy_th = 0.1  # Avoid frames with an energy that is 1/10 over the average energy
@@ -43,7 +43,7 @@ options = read_conf_inp(cfg_file)
 
 # [data]
 pt_file = options.pt_file
-output_folder = options.output_folder
+#output_folder = options.output_folder
 
 # [windowing]
 fs = int(options.fs)
