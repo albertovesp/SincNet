@@ -256,7 +256,7 @@ with torch.no_grad():
         d_vect_dict[dict_key] = d_vect_out.cpu().numpy()
         print(dict_key)
 
-print("finish")
+
 
 # Save the dictionary
 np.save(out_dict_file, d_vect_dict)

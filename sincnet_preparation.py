@@ -83,7 +83,7 @@ def main():
 
   #save dictionary
   np.save(args.output_list + 'overlapped_dict.npy',overlapped_dict)
-  print("finish")
+  
 if __name__ == '__main__':
   main()
          
