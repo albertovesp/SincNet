@@ -166,99 +166,107 @@ with torch.no_grad():
 
         #for reference
 
-        [signal, fs] = sf.read(wav_lst_te[i])
-        
-        print(key,len(overlapped_dict[key]))
-       
-        # Amplitude normalization
-        #   signal=signal/np.max(np.abs(signal))
-        signal = signal / np.linalg.norm(signal)
-        signal = torch.from_numpy(signal).float().to(device).contiguous()
+        [audio, fs] = sf.read(wav_lst_te[i])
+        for pair in overlapped_dict[key]:
+            if pair[0] == pair[1]:
+                continue
+            ta = int(math.floor(pair[0] * fs))
+            tb = int(math.floor(pair[1] * fs))
+            segment = audio[ta:tb]
+            # hamming window with length = segment
+            hamming = np.hamming(len(segment))
+            signal = hamming * segment
 
-        if avoid_small_en_fr:
-            # computing energy on each frame:
+            # Amplitude normalization
+            #   signal=signal/np.max(np.abs(signal))
+            signal = signal / np.linalg.norm(signal)
+            signal = torch.from_numpy(signal).float().to(device).contiguous()
+
+            if avoid_small_en_fr:
+                # computing energy on each frame:
+                beg_samp = 0
+                end_samp = wlen
+
+                N_fr = int((signal.shape[0] - wlen) / (wshift))
+
+                if N_fr < 10:
+                    print('skip')
+                    continue
+
+                Batch_dev = N_fr
+                en_arr = torch.zeros(N_fr).float().contiguous().to(device)
+                count_fr = 0
+                count_fr_tot = 0
+                while end_samp < signal.shape[0]:
+                    en_arr[count_fr] = torch.sum(signal[beg_samp:end_samp].pow(2))
+                    beg_samp = beg_samp + wshift
+                    end_samp = beg_samp + wlen
+                    count_fr = count_fr + 1
+                    count_fr_tot = count_fr_tot + 1
+                    if count_fr == N_fr:
+                        break
+
+                en_arr_bin = en_arr > torch.mean(en_arr) * 0.1
+                en_arr_bin.to(device)
+                n_vect_elem = torch.sum(en_arr_bin)
+
+                if n_vect_elem < 10:
+                    print('only few elements used to compute d-vectors')
+                    continue
+                    # sys.exit(0)
+
+            # split signals into chunks
             beg_samp = 0
             end_samp = wlen
 
             N_fr = int((signal.shape[0] - wlen) / (wshift))
 
-            if N_fr < 10:
-                print('skip')
-                continue
-
-            Batch_dev = N_fr
-            en_arr = torch.zeros(N_fr).float().contiguous().to(device)
+            sig_arr = torch.zeros([Batch_dev, wlen]).float().to(
+                device).contiguous()
+            dvects = Variable(torch.zeros(
+                N_fr, d_vector_dim).float().to(device).contiguous())
             count_fr = 0
             count_fr_tot = 0
             while end_samp < signal.shape[0]:
-                en_arr[count_fr] = torch.sum(signal[beg_samp:end_samp].pow(2))
+                sig_arr[count_fr, :] = signal[beg_samp:end_samp]
                 beg_samp = beg_samp + wshift
                 end_samp = beg_samp + wlen
                 count_fr = count_fr + 1
                 count_fr_tot = count_fr_tot + 1
-                if count_fr == N_fr:
-                    break
+                if count_fr == Batch_dev:
+                    inp = Variable(sig_arr)
+                    dvects[count_fr_tot - Batch_dev:count_fr_tot,
+                    :] = DNN1_net(CNN_net(inp))
+                    count_fr = 0
+                    sig_arr = torch.zeros([Batch_dev, wlen]).float().to(
+                        device).contiguous()
 
-            en_arr_bin = en_arr > torch.mean(en_arr) * 0.1
-            en_arr_bin.to(device)
-            n_vect_elem = torch.sum(en_arr_bin)
-
-            if n_vect_elem < 10:
-                print('only few elements used to compute d-vectors')
-                continue
-                # sys.exit(0)
-
-        # split signals into chunks
-        beg_samp = 0
-        end_samp = wlen
-
-        N_fr = int((signal.shape[0] - wlen) / (wshift))
-
-        sig_arr = torch.zeros([Batch_dev, wlen]).float().to(
-            device).contiguous()
-        dvects = Variable(torch.zeros(
-            N_fr, d_vector_dim).float().to(device).contiguous())
-        count_fr = 0
-        count_fr_tot = 0
-        while end_samp < signal.shape[0]:
-            sig_arr[count_fr, :] = signal[beg_samp:end_samp]
-            beg_samp = beg_samp + wshift
-            end_samp = beg_samp + wlen
-            count_fr = count_fr + 1
-            count_fr_tot = count_fr_tot + 1
-            if count_fr == Batch_dev:
-                inp = Variable(sig_arr)
-                dvects[count_fr_tot - Batch_dev:count_fr_tot,
+            if count_fr > 0:
+                inp = Variable(sig_arr[0:count_fr])
+                dvects[count_fr_tot - count_fr:count_fr_tot,
                 :] = DNN1_net(CNN_net(inp))
-                count_fr = 0
-                sig_arr = torch.zeros([Batch_dev, wlen]).float().to(
-                    device).contiguous()
 
-        if count_fr > 0:
-            inp = Variable(sig_arr[0:count_fr])
-            dvects[count_fr_tot - count_fr:count_fr_tot,
-            :] = DNN1_net(CNN_net(inp))
+            if avoid_small_en_fr:
+                dvects = dvects.index_select(
+                    0, (en_arr_bin == 1).nonzero().view(-1))
 
-        if avoid_small_en_fr:
-            dvects = dvects.index_select(
-                0, (en_arr_bin == 1).nonzero().view(-1))
+            # averaging and normalizing all the d-vectors
+            d_vect_out = torch.mean(
+                dvects / dvects.norm(p=2, dim=1).view(-1, 1), dim=0)
 
-        # averaging and normalizing all the d-vectors
-        d_vect_out = torch.mean(
-            dvects / dvects.norm(p=2, dim=1).view(-1, 1), dim=0)
+            # checks for nan
+            nan_sum = torch.sum(torch.isnan(d_vect_out))
 
-        # checks for nan
-        nan_sum = torch.sum(torch.isnan(d_vect_out))
+            if nan_sum > 0:
+                print("nan")
+                continue
 
-        if nan_sum > 0:
-            print(wav_lst_te[i])
-            continue
-
-        # saving the d-vector in a numpy dictionary
-        dict_key = wav_lst_te[i].split(
-            '/')[-2] + '/' + wav_lst_te[i].split('/')[-1]
-        d_vect_dict[dict_key] = d_vect_out.cpu().numpy()
-        print(dict_key)
+            # saving the d-vector in a numpy dictionary
+            #dict_key = wav_lst_te[i].split(
+            #    '/')[-2] + '/' + wav_lst_te[i].split('/')[-1]
+            dict_key = str(key) + "-" + str(int(pair[0]*100)).zfill(6) + "-" + str(int(pair[1]*100)).zfill(6)
+            d_vect_dict[dict_key] = d_vect_out.cpu().numpy()
+            print(dict_key)
 
 
 
