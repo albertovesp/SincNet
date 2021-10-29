@@ -78,6 +78,9 @@ def main():
       else:
         overlapped_dict[key].extend(overlapped_list)
   wav_f.close()
+  
+  for key in overlapped_dict.keys():
+    overlapped_dict[key] = list(set(overlapped_dict[key]))
 
   #save dictionary
   np.save(args.output_list + '/overlapped_dict.npy',overlapped_dict)

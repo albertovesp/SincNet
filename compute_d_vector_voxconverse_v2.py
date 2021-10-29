@@ -163,6 +163,7 @@ overlapped_dict = overlapped_dict.tolist()
 with torch.no_grad():
     for i in range(snt_te):
         key = wav_lst_te[i][-9:-4]
+        print("working",key)
 
         #for reference
 
@@ -173,12 +174,15 @@ with torch.no_grad():
             ta = int(math.floor(pair[0] * fs))
             tb = int(math.floor(pair[1] * fs))
             segment = audio[ta:tb]
+            if len(segment) <= 0:
+                continue
             # hamming window with length = segment
             hamming = np.hamming(len(segment))
             signal = hamming * segment
 
             # Amplitude normalization
             #   signal=signal/np.max(np.abs(signal))
+            
             signal = signal / np.linalg.norm(signal)
             signal = torch.from_numpy(signal).float().to(device).contiguous()
 
@@ -190,7 +194,7 @@ with torch.no_grad():
                 N_fr = int((signal.shape[0] - wlen) / (wshift))
 
                 if N_fr < 10:
-                    print('skip')
+                    #print('skip')
                     continue
 
                 Batch_dev = N_fr
@@ -211,7 +215,7 @@ with torch.no_grad():
                 n_vect_elem = torch.sum(en_arr_bin)
 
                 if n_vect_elem < 10:
-                    print('only few elements used to compute d-vectors')
+                    #print('only few elements used to compute d-vectors')
                     continue
                     # sys.exit(0)
 
@@ -259,14 +263,15 @@ with torch.no_grad():
 
             if nan_sum > 0:
                 print("nan")
-                continue
+                #continue
 
             # saving the d-vector in a numpy dictionary
             #dict_key = wav_lst_te[i].split(
             #    '/')[-2] + '/' + wav_lst_te[i].split('/')[-1]
             dict_key = str(key) + "-" + str(int(pair[0]*100)).zfill(6) + "-" + str(int(pair[1]*100)).zfill(6)
             d_vect_dict[dict_key] = d_vect_out.cpu().numpy()
-            print(dict_key)
+            #print(dict_key)
+        print("finish",key)
 
 
 
