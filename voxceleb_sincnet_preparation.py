@@ -77,8 +77,8 @@ def main():
       else:
         overlapped_dict[key].extend(overlapped_list)
 
- for key in overlapped_dict.keys():
-   print(key,overlappped_dict[key])
+  for key in overlapped_dict.keys():
+    print(key,overlappped_dict[key])
 #  number_d = 0
 #  for key in overlapped_dict.keys():
 #    overlapped_dict[key] = sorted(list(set(overlapped_dict[key])))
