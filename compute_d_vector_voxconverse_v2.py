@@ -1,9 +1,11 @@
+#!/usr/bin/env python3
 # compute_d_vector.py
 # Mirco Ravanelli
 # Mila - University of Montreal
 
 # Feb 2019
 
+# Alberto Villalvazo 2021
 # Description:
 # This code computes d-vectors using a pre-trained model
 

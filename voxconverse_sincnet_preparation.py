@@ -13,14 +13,14 @@ class Segment_line:
     words = original_line.strip().split()
     self.recording = words[1]
     self.begin = round(float(words[2]), 2)
-    self.end = round(self.begin + float(words[3]), 2)
+    self.end   = round(float(words[3]), 2)
   def __str__(self):
     return 'segment_line -> begin: ' + str(self.begin) + ' end: ' + str(self.end)
 
 #Compute the overlapping window, with 30% of overlap
 def overlap(pair,duration,window):
     overlapped_list = []
-    overlap_percent = 0.75
+    overlap_percent = 0.33
     #number of overlapped segments
     segments= math.floor(duration/(window*(1-overlap_percent)))
     overlapped_list = [(pair[0],pair[0]+window)]
@@ -37,7 +37,7 @@ def overlap(pair,duration,window):
 def get_args():
   parser = argparse.ArgumentParser(description = '')
   parser.add_argument('segments_file', type = str, help = 'segments file')
-  parser.add_argument('wav_path', type = str, help = 'Path to wav files')
+  parser.add_argument('wav_path', type = str, help = 'Wav files path')  
   parser.add_argument('output_list', type = str, help = 'Output path')
   args = parser.parse_args()
   return args
@@ -46,8 +46,8 @@ def get_args():
 def main():
   args = get_args()
 
-  if not os.path.isfile(args.segments_file) or not os.path.isdir(args.wav_path) :
-    sys.exit(args.segments_file + ' not found or is not file or ' + args.wav_path + " not found")
+  if not os.path.isfile(args.segments_file) or not os.path.isdir(args.wav_path): 
+    sys.exit(args.segments_file + ' not found or is not file or ' + args.wav_path + ' not exit')
 
 
   if not os.path.exists(args.output_list):
@@ -78,10 +78,12 @@ def main():
       else:
         overlapped_dict[key].extend(overlapped_list)
   wav_f.close()
-  
+ 
+  number_d = 0
   for key in overlapped_dict.keys():
-    overlapped_dict[key] = list(set(overlapped_dict[key]))
-
+    overlapped_dict[key] = sorted(list(set(overlapped_dict[key])))
+    
+  
   #save dictionary
   np.save(args.output_list + '/overlapped_dict.npy',overlapped_dict)
   
