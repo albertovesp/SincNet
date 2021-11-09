@@ -168,8 +168,8 @@ with torch.no_grad():
         print("working",key)
 
         #for reference
-        break
-        [audio, fs] = sf.read(wav_lst_te[i])
+
+        #[audio, fs] = sf.read(wav_lst_te[i])
         for pair in overlapped_dict[key]:
             if pair[0] == pair[1]:
                 continue
