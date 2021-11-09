@@ -17,6 +17,14 @@ class Segment_line:
   def __str__(self):
     return 'segment_line -> begin: ' + str(self.begin) + ' end: ' + str(self.end)
 
+class Wav_line:
+  def __init__(self, original_line):
+    words = original_line.strip().split()
+    self.recording = words[0]
+    self.path = words[5]
+  def __str__(self):
+    return 'wav_line -> begin: ' + self.recording + ' end: ' + self.path
+
 #Compute the overlapping window, with 30% of overlap
 def overlap(pair,duration,window):
     overlapped_list = []
@@ -52,6 +60,14 @@ def main():
 
   if not os.path.exists(args.output_list):
     os.makedirs(args.output_list)
+
+  wav_f = open(args.wav_file,'r')
+  wav_dict = {}
+  for line in wav_f.readlines():
+    wav_line = Wav_line(line)
+    if wav_line.recording not in wav_dict:
+      wav_dict[wav_line.recording] = wav_line.path
+
   # read the segments file
   f = open(args.segments_file, 'r')
   segments_dict = {}
@@ -63,10 +79,7 @@ def main():
       segments_dict[segment_line.recording].append((segment_line.begin,segment_line.end))
   f.close()
 
-  for key in segments_dict.keys():
-    print(key,segments_dict[key])
   #creates a dictionary with overlapping timestamps, each segment has a 1.5s duration
-
   overlapped_dict = {}
   for key in segments_dict.keys():
     for pair in segments_dict[key]:
@@ -76,13 +89,12 @@ def main():
         overlapped_dict[key] = overlapped_list
       else:
         overlapped_dict[key].extend(overlapped_list)
-
-  for key in overlapped_dict.keys():
-    print(key,overlapped_dict[key])
 #  number_d = 0
-#  for key in overlapped_dict.keys():
-#    overlapped_dict[key] = sorted(list(set(overlapped_dict[key])))
-    
+  for key in overlapped_dict.keys():
+    overlapped_dict[key] = sorted(list(set(overlapped_dict[key])))
+
+  for key in wav_dict.keys():
+    print(key,wav_dict[key])
   
   #save dictionary
 #  np.save(args.output_list + '/overlapped_dict.npy',overlapped_dict)
