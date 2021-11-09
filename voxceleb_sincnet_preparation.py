@@ -21,7 +21,7 @@ class Wav_line:
   def __init__(self, original_line):
     words = original_line.strip().split()
     self.recording = words[0]
-    self.path = words[5]
+    self.path = words[1]
   def __str__(self):
     return 'wav_line -> begin: ' + self.recording + ' end: ' + self.path
 
