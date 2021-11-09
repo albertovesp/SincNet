@@ -64,12 +64,21 @@ def main():
   if not os.path.exists(args.output_list):
     os.makedirs(args.output_list)
 
+  #read wav file
   wav_f = open(args.wav_file,'r')
   wav_dict = {}
   for line in wav_f.readlines():
     wav_line = Wav_line(line)
     if wav_line.recording not in wav_dict:
       wav_dict[wav_line.recording] = wav_line.path
+  wav_f.close()
+
+  #create a new wav.scp file
+  wav_out = open(args.output_list+'/wav.scp', 'w')
+  for key in wav_dict.keys():
+    wav_str = "{}\n".format(wav_dict[key])
+    wav_out.write(wav_str)
+  wav_out.close()
 
   # read the segments file
   f = open(args.segments_file, 'r')
