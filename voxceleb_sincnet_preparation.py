@@ -66,21 +66,19 @@ def main():
   for key in segments_dict.keys():
     print(key,segments_dict[key])
   #creates a dictionary with overlapping timestamps, each segment has a 1.5s duration
-#  wav_f = open(args.output_list + "/wav.scp", "w")
-#  overlapped_dict = {}
-#  for key in segments_dict.keys():
-#    wav_file = args.wav_path + '/' + str(key) + ".wav"
-#    wav_str = "{}\n".format(wav_file)
-#    wav_f.write(wav_str)
-#    for pair in segments_dict[key]:
-#      duration = pair[1] - pair[0]
-#      overlapped_list = overlap(pair,duration,1.5)
-#      if key not in overlapped_dict:
-#        overlapped_dict[key] = overlapped_list
-#      else:
-#        overlapped_dict[key].extend(overlapped_list)
-#  wav_f.close()
- 
+
+  overlapped_dict = {}
+  for key in segments_dict.keys():
+    for pair in segments_dict[key]:
+      duration = pair[1] - pair[0]
+      overlapped_list = overlap(pair,duration,1.5)
+      if key not in overlapped_dict:
+        overlapped_dict[key] = overlapped_list
+      else:
+        overlapped_dict[key].extend(overlapped_list)
+
+ for key in overlapped_dict.keys():
+   print(key,overlappped_dict[key])
 #  number_d = 0
 #  for key in overlapped_dict.keys():
 #    overlapped_dict[key] = sorted(list(set(overlapped_dict[key])))
