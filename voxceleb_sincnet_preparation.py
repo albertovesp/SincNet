@@ -105,11 +105,9 @@ def main():
   for key in overlapped_dict.keys():
     overlapped_dict[key] = sorted(list(set(overlapped_dict[key])))
 
-  for key in wav_dict.keys():
-    print(key,wav_dict[key])
   
   #save dictionary
-#  np.save(args.output_list + '/overlapped_dict.npy',overlapped_dict)
+  np.save(args.output_list + '/overlapped_dict.npy',overlapped_dict)
   
 if __name__ == '__main__':
   main()
