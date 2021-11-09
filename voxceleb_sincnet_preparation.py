@@ -22,6 +22,7 @@ class Wav_line:
     words = original_line.strip().split()
     self.recording = words[0]
     self.path = words[1]
+    self.len  = len(words)
   def __str__(self):
     return 'wav_line -> begin: ' + self.recording + ' end: ' + self.path
 
@@ -66,7 +67,7 @@ def main():
   for line in wav_f.readlines():
     wav_line = Wav_line(line)
     if wav_line.recording not in wav_dict:
-      wav_dict[wav_line.recording] = wav_line.path
+      wav_dict[wav_line.recording] = wav_line.len
 
   # read the segments file
   f = open(args.segments_file, 'r')
