@@ -164,7 +164,7 @@ overlapped_dict = np.load(overlap_dict,allow_pickle=True)
 overlapped_dict = overlapped_dict.tolist()
 with torch.no_grad():
     for i in range(snt_te):
-        key = wav_lst_te[i][-9:-4]
+        key = wav_lst_te[i]
         print("working",key)
 
         #for reference
