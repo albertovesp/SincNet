@@ -46,8 +46,8 @@ def get_args():
 def main():
   args = get_args()
 
-  if not os.path.isfile(args.segments_file) or not os.path.isfile(args.wav_path):
-    sys.exit(args.segments_file + ' not found or is not file or ' + args.wav_path + ' not exit')
+  if not os.path.isfile(args.segments_file) or not os.path.isfile(args.wav_file):
+    sys.exit(args.segments_file + ' not found or is not file or ' + args.wav_file + ' not exit')
 
 
   if not os.path.exists(args.output_list):
