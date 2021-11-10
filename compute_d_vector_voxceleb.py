@@ -169,15 +169,16 @@ with torch.no_grad():
         key = words[0]
         wav_file = words[1]
         print("working",key)
-        
+
         if wav_file[-3:] != "wav":
             print("not wav file")
             audio_m4a = AudioSegment.from_file(wav_file)
             wav_file = wav_file[:-4] + ".wav"
             audio_m4a.export(wav_file, format='wav')
-            [audio, fs] = sf.read(wav_file[1])
+            [audio, fs] = sf.read(wav_file)
+            print(wav_file,"converted")
         else:
-            [audio, fs] = sf.read(wav_file[1])
+            [audio, fs] = sf.read(wav_file)
 
         for pair in overlapped_dict[key]:
             if pair[0] == pair[1]:
