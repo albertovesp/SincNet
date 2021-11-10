@@ -169,7 +169,7 @@ with torch.no_grad():
 
         #for reference
 
-        #[audio, fs] = sf.read(wav_lst_te[i])
+        [audio, fs] = sf.read(wav_lst_te[i])
         for pair in overlapped_dict[key]:
             if pair[0] == pair[1]:
                 continue
@@ -184,7 +184,6 @@ with torch.no_grad():
 
             # Amplitude normalization
             #   signal=signal/np.max(np.abs(signal))
-            
             signal = signal / np.linalg.norm(signal)
             signal = torch.from_numpy(signal).float().to(device).contiguous()
 
