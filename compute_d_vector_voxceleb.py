@@ -172,9 +172,11 @@ with torch.no_grad():
 
         #[audio, fs] = sf.read(wav_lst_te[i])
 
-        audio = AudioSegment.from_file(wav_lst_te[i])
-        audio.export(wav_lst_te[i][:-4]+".wav", format='wav')
+        #audio = AudioSegment.from_file(wav_lst_te[i])
+        #audio.export(wav_lst_te[i][:-4]+".wav", format='wav')
         print(wav_lst_te[i])
+        if wav_lst_te[i][-3:] == "wav":
+            print("not wav file")
         sys.exit()
         for pair in overlapped_dict[key]:
             if pair[0] == pair[1]:
