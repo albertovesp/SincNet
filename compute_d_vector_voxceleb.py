@@ -165,18 +165,18 @@ overlapped_dict = np.load(overlap_dict,allow_pickle=True)
 overlapped_dict = overlapped_dict.tolist()
 with torch.no_grad():
     for i in range(snt_te):
-        key = wav_lst_te[i][47:54]+"-"+wav_lst_te[i][55:66]+"-"+wav_lst_te[i][67:-4]
+        key = wav_lst_te[i][0]
         print("working",key)
-
-        if wav_lst_te[i][-3:] != "wav":
+        print("file",wav_lst_te[i][1][:-4])
+        if wav_lst_te[i][1][-3:] != "wav":
             print("not wav file")
-            audio_m4a = AudioSegment.from_file(wav_lst_te[i])
-            wav_lst_te[i] = wav_lst_te[i][:-4] + ".wav"
-            audio_m4a.export(wav_lst_te[i], format='wav')
-            [audio, fs] = sf.read(wav_lst_te[i][:-4]+".wav")
+            audio_m4a = AudioSegment.from_file(wav_lst_te[i][1])
+            wav_lst_te[i][1] = wav_lst_te[i][1][:-4] + ".wav"
+            audio_m4a.export(wav_lst_te[i][1], format='wav')
+            [audio, fs] = sf.read(wav_lst_te[i][1])
         else:
-            [audio, fs] = sf.read(wav_lst_te[i])
-
+            [audio, fs] = sf.read(wav_lst_te[i][1])
+        sys.exit()
         for pair in overlapped_dict[key]:
             if pair[0] == pair[1]:
                 continue
