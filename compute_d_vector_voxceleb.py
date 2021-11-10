@@ -20,6 +20,7 @@ import numpy as np
 from dnn_models import MLP
 from dnn_models import SincNet as CNN
 from data_io import ReadList, read_conf_inp, str_to_bool
+from pydub import AudioSegment
 import sys
 
 # Model to use for computing the d-vectors
@@ -169,7 +170,11 @@ with torch.no_grad():
 
         #for reference
 
-        [audio, fs] = sf.read(wav_lst_te[i])
+        #[audio, fs] = sf.read(wav_lst_te[i])
+
+        audio = AudioSegment.from_file(wav_lst_te[i])
+        print(type(audio))
+        sys.exit()
         for pair in overlapped_dict[key]:
             if pair[0] == pair[1]:
                 continue
