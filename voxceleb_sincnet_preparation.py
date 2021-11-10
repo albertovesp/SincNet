@@ -3,9 +3,6 @@
 # Apache 2.0
 import argparse, os, sys
 import numpy as np
-import shutil
-import soundfile as sf
-import sox
 import math
 
 class Segment_line:
