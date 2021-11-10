@@ -176,7 +176,7 @@ with torch.no_grad():
         #audio.export(wav_lst_te[i][:-4]+".wav", format='wav')
         print(wav_lst_te[i])
         print(wav_lst_te[i][-3:])
-        if wav_lst_te[i][-3:] == "wav":
+        if wav_lst_te[i][-3:] != "wav":
             print("not wav file")
         sys.exit()
         for pair in overlapped_dict[key]:
