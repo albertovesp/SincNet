@@ -172,7 +172,7 @@ with torch.no_grad():
             print("not wav file")
             audio_m4a = AudioSegment.from_file(wav_lst_te[i])
             wav_lst_te[i] = wav_lst_te[i][:-4] + ".wav"
-            audio_m4a.export(, format='wav')
+            audio_m4a.export(wav_lst_te[i], format='wav')
             [audio, fs] = sf.read(wav_lst_te[i][:-4]+".wav")
         else:
             [audio, fs] = sf.read(wav_lst_te[i])
