@@ -76,7 +76,7 @@ def main():
   #create a new wav.scp file
   wav_out = open(args.output_list+'/wav.scp', 'w')
   for key in wav_dict.keys():
-    wav_str = "{}\n".format(wav_dict[key])
+    wav_str = "{} {}\n".format(key, wav_dict[key])
     wav_out.write(wav_str)
   wav_out.close()
 
