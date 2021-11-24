@@ -3,9 +3,6 @@
 # Apache 2.0
 import argparse, os, sys
 import numpy as np
-import shutil
-import soundfile as sf
-import sox
 import math
 
 class Segment_line:
@@ -56,21 +53,19 @@ def main():
     if segment_line.wav not in wav_dict:
       wav_dict[segment_line.wav] = args.wav_path + '/' + segment_line.wav + ".wav"
   f.close()
-   
+ 
   #creates a dictionary with overlapping timestamps, each segment has a 1.5s duration
 
-#  wav_f = open(args.output_list + "/wav.scp", "w")
-#  overlapped_dict = {}
-#  for key in segments_dict.keys():
-#    wav_file = args.wav_path + '/' + str(key) + ".wav"
-#    wav_str = "{}\n".format(wav_file)
-#    wav_f.write(wav_str)
-#  wav_f.close()
+  wav_f = open(args.output_list + "/wav.scp", "w")
+  for key in wav_dict.keys():
+    wav_str = "{}\n".format(wav_dict[key])
+    wav_f.write(wav_str)
+  wav_f.close()
 
 
 
   #save dictionary
-#  np.save(args.output_list + '/overlapped_dict.npy',overlapped_dict)
+  np.save(args.output_list + '/segments_dict.npy',segments_dict)
 
 if __name__ == '__main__':
   main()
