@@ -90,7 +90,7 @@ def main():
   f.close()
 
   #save dictionary
-  np.save(args.output_list + '/overlapped_dict.npy',overlapped_dict)
+#  np.save(args.output_list + '/overlapped_dict.npy',overlapped_dict)
   
 if __name__ == '__main__':
   main()
