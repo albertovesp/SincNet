@@ -74,7 +74,6 @@ def main():
   wav_out = open(args.output_list+'/wav.scp', 'w')
   for key in wav_dict.keys():
     wav_str = "{} {}\n".format(key, wav_dict[key])
-    print(wav_str)
     wav_out.write(wav_str)
   wav_out.close()
 
@@ -89,10 +88,8 @@ def main():
       segments_dict[segment_line.recording].append((segment_line.begin,segment_line.end))
   f.close()
 
-  for key in segments_dict.keys():
-    print(key,segments_dict[key])
   #save dictionary
-#  np.save(args.output_list + '/overlapped_dict.npy',overlapped_dict)
+  np.save(args.output_list + '/segments_dict.npy',segments_dict)
   
 if __name__ == '__main__':
   main()
