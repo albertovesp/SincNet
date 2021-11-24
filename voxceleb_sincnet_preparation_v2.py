@@ -8,7 +8,7 @@ import math
 class Segment_line:
   def __init__(self, original_line):
     words = original_line.strip().split()
-    self.recording = words[1]
+    self.recording = words[0]
     self.begin = round(float(words[2]), 2)
     self.end   = round(float(words[3]), 2)
   def __str__(self):
@@ -71,12 +71,12 @@ def main():
   wav_f.close()
 
   #create a new wav.scp file
-#  wav_out = open(args.output_list+'/wav.scp', 'w')
+  wav_out = open(args.output_list+'/wav.scp', 'w')
   for key in wav_dict.keys():
     wav_str = "{} {}\n".format(key, wav_dict[key])
     print(wav_str)
-  #  wav_out.write(wav_str)
- # wav_out.close()
+    wav_out.write(wav_str)
+  wav_out.close()
 
   # read the segments file
   f = open(args.segments_file, 'r')
@@ -89,6 +89,8 @@ def main():
       segments_dict[segment_line.recording].append((segment_line.begin,segment_line.end))
   f.close()
 
+  for key in segments_dict.keys():
+    print(key,segments_dict[key])
   #save dictionary
 #  np.save(args.output_list + '/overlapped_dict.npy',overlapped_dict)
   
