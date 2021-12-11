@@ -25,23 +25,6 @@ class Wav_line:
   def __str__(self):
     return 'wav_line -> begin: ' + self.recording + ' end: ' + self.path
 
-#Compute the overlapping window, with 30% of overlap
-def overlap(pair,duration,window):
-    overlapped_list = []
-    overlap_percent = 0.33
-    #number of overlapped segments
-    segments= math.floor(duration/(window*(1-overlap_percent)))
-    overlapped_list = [(pair[0],pair[0]+window)]
-    for i in range(segments):
-      t0 = round(pair[0]+window*(1-overlap_percent)*(i+1),2)
-      t1 = round(t0 + window,2)
-      if t0 >= pair[1]:
-        continue
-      if t1 >= pair[1]:
-        t1 = pair[1]
-      overlapped_list.append((t0,t1))
-    return overlapped_list
-
 def get_args():
   parser = argparse.ArgumentParser(description = '')
   parser.add_argument('segments_file', type = str, help = 'segments file')
@@ -87,6 +70,7 @@ def main():
     else:
       segments_dict[segment_line.recording].append((segment_line.begin,segment_line.end))
   f.close()
+  
 
   #save dictionary
   np.save(args.output_list + '/segments_dict.npy',segments_dict)

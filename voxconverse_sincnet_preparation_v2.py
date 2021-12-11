@@ -53,7 +53,6 @@ def main():
     if segment_line.wav not in wav_dict:
       wav_dict[segment_line.wav] = args.wav_path + '/' + segment_line.wav + ".wav"
   f.close()
- 
   #creates a dictionary with overlapping timestamps, each segment has a 1.5s duration
 
   wav_f = open(args.output_list + "/wav.scp", "w")
