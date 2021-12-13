@@ -164,12 +164,14 @@ overlapped_dict = np.load(overlap_dict,allow_pickle=True)
 overlapped_dict = overlapped_dict.tolist()
 with torch.no_grad():
     for i in range(snt_te):
-        key = wav_lst_te[i][-9:-4]
-        print("working",key)
+        name = wav_lst_te[i][-9:-4]
+        print("working",name)
         
         #for reference
 
         [audio, fs] = sf.read(wav_lst_te[i])
+        for key in overlapped_dict.keys():
+            print(key,key[:5])
         for pair in overlapped_dict[key]:
             if pair[0] == pair[1]:
                 continue
