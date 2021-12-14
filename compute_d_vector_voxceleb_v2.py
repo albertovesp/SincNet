@@ -169,6 +169,8 @@ with torch.no_grad():
         key = words[0]
         wav_file = words[1]
         print("working",key)
+        print(wav_file)
+        sys.exit()
 
         if wav_file[-3:] != "wav":
             print("not wav file")
