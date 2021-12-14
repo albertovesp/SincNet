@@ -183,8 +183,9 @@ with torch.no_grad():
             [audio, fs] = sf.read(wav_file)
 
         for key in overlapped_dict.keys():
-            print(key[:24],name)
-            sys.exit()
+            if name != key[:25]:
+                continue
+
             for pair in overlapped_dict[key]:
                 if pair[0] == pair[1]:
                     continue
