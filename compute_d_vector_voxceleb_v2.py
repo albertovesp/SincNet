@@ -284,7 +284,7 @@ with torch.no_grad():
                 dict_key = str(key)
                 d_vect_dict[dict_key] = d_vect_out.cpu().numpy()
                 #print(dict_key)
-        print("finish",key)
+        print("finish",name)
 
 
 
