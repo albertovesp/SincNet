@@ -56,6 +56,7 @@ for i in range(len(list_sig)):
  
  # Open the wav file
  wav_file=in_folder+'/'+list_sig[i]
+ print("wav_file",wav_file)
  [signal, fs] = sf.read(wav_file)
  signal=signal.astype(np.float64)
 
@@ -74,7 +75,6 @@ for i in range(len(list_sig)):
  
  # Save normalized speech
  file_out=out_folder+'/'+list_sig[i]
- print('AQUIIIIMERO')
  print(file_out)
  sf.write(file_out, signal, fs)
  

@@ -25,9 +25,9 @@ import sys
 
 # Model to use for computing the d-vectors
 # This is the model to use for computing the d-vectors (it should be pre-trained using the speaker-id DNN)
-model_file = '/ciiia/home/ciiiau3/SincNet-alberto/exp/SincNet_TIMIT/model_raw.pkl'
+model_file ='/export/c07/carlosc/albertov/SincNet/exp/SincNet_TIMIT/model_raw.pkl'
 # Config file of the speaker-id experiment used to generate the model
-cfg_file = '/ciiia/home/ciiiau3/SincNet-alberto/cfg/SincNet_voxconverse.cfg'
+cfg_file ='/export/c07/carlosc/albertov/SincNet/cfg/SincNet_Voxconverse_512.cfg'
 
 
 te_lst = sys.argv[1]
@@ -168,22 +168,25 @@ with torch.no_grad():
         words= wav_lst_te[i].strip().split()
         name = words[0]
         wav_file = words[1]
-        print("working",name)
+        #print("working",name)
 
 
 
         if wav_file[-3:] != "wav":
-            print("not wav file")
+            #print("not wav file")
             audio_m4a = AudioSegment.from_file(wav_file)
             wav_file = wav_file[:-4] + ".wav"
             audio_m4a.export(wav_file, format='wav')
             [audio, fs] = sf.read(wav_file)
-            print(wav_file,"converted")
+            #print(wav_file,"converted")
         else:
             [audio, fs] = sf.read(wav_file)
 
         for key in overlapped_dict.keys():
-            if name != key[:25]:
+            name_split = name.split("-")
+            key_split  = key.split("-") 
+            if name_split[:3] != key_split[:3]:
+                print("name",name_split[:3],"key",key_split[:3])
                 continue
 
             for pair in overlapped_dict[key]:
@@ -278,13 +281,13 @@ with torch.no_grad():
                 nan_sum = torch.sum(torch.isnan(d_vect_out))
 
                 if nan_sum > 0:
-                    print("nan")
+                    #print("nan")
                     continue
 
                 dict_key = str(key)
                 d_vect_dict[dict_key] = d_vect_out.cpu().numpy()
                 #print(dict_key)
-        print("finish",name)
+        #print("finish",name)
 
 
 

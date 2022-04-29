@@ -26,7 +26,7 @@ from dnn_models import SincNet as CNN
 from data_io import ReadList,read_conf,str_to_bool
 
 
-def create_batches_rnd(batch_size,data_folder,wav_lst,N_snt,wlen,lab_dict,fact_amp):
+def create_batches_rnd(batch_size,data_folder,wav_lst,N_snt,wlen,lab_dict,fact_amp,seg_tr_dict):
     
  # Initialization of the minibatch (batch_size,[0=>x_t,1=>x_t+N,1=>random_samp])
  sig_batch=np.zeros([batch_size,wlen])
@@ -41,21 +41,25 @@ def create_batches_rnd(batch_size,data_folder,wav_lst,N_snt,wlen,lab_dict,fact_a
   # select a random sentence from the list 
   #[fs,signal]=scipy.io.wavfile.read(data_folder+wav_lst[snt_id_arr[i]])
   #signal=signal.astype(float)/32768
+  for key in seg_tr_dict.keys():
+   print(wav_lst[0],key)
 
-  [signal, fs] = sf.read(data_folder+wav_lst[snt_id_arr[i]])
 
-  # accesing to a random chunk
-  snt_len=signal.shape[0]
-  snt_beg=np.random.randint(snt_len-wlen-1) #randint(0, snt_len-2*wlen-1)
-  snt_end=snt_beg+wlen
+   sys.exit()
+   [signal, fs] = sf.read(wav_lst[snt_id_arr[i]])
 
-  channels = len(signal.shape)
-  if channels == 2:
-    print('WARNING: stereo to mono: '+data_folder+wav_lst[snt_id_arr[i]])
-    signal = signal[:,0]
+   # accesing to a random chunk
+   snt_len=signal.shape[0]
+   snt_beg=np.random.randint(snt_len-wlen-1) #randint(0, snt_len-2*wlen-1)
+   snt_end=snt_beg+wlen
+
+   channels = len(signal.shape)
+   if channels == 2:
+     print('WARNING: stereo to mono: '+data_folder+wav_lst[snt_id_arr[i]])
+     signal = signal[:,0]
   
-  sig_batch[i,:]=signal[snt_beg:snt_end]*rand_amp_arr[i]
-  lab_batch[i]=lab_dict[wav_lst[snt_id_arr[i]]]
+   sig_batch[i,:]=signal[snt_beg:snt_end]*rand_amp_arr[i]
+   lab_batch[i]=lab_dict[wav_lst[snt_id_arr[i]]]
   
  inp=Variable(torch.from_numpy(sig_batch).float().cuda().contiguous())
  lab=Variable(torch.from_numpy(lab_batch).float().cuda().contiguous())
@@ -74,6 +78,8 @@ pt_file=options.pt_file
 class_dict_file=options.lab_dict
 data_folder=options.data_folder+'/'
 output_folder=options.output_folder
+seg_tr ="/export/c07/carlosc/albertov/SincNet/data_lists/VoxCeleb/segments_train.npy" 
+seg_te ="/export/c07/carlosc/albertov/SincNet/data_lists/VoxCeleb/segments_test.npy" 
 
 #[windowing]
 fs=int(options.fs)
@@ -172,6 +178,8 @@ CNN_net.cuda()
 # Loading label dictionary
 print('ok')
 lab_dict=np.load(class_dict_file,allow_pickle=True).item()
+seg_tr_dict=np.load(seg_tr,allow_pickle=True).item()
+seg_te_dict=np.load(seg_te,allow_pickle=True).item()
 print('ok2')
 
 
@@ -230,7 +238,7 @@ for epoch in range(N_epochs):
 
   for i in range(N_batches):
 
-    [inp,lab]=create_batches_rnd(batch_size,data_folder,wav_lst_tr,snt_tr,wlen,lab_dict,0.2)
+    [inp,lab]=create_batches_rnd(batch_size,data_folder,wav_lst_tr,snt_tr,wlen,lab_dict,0.2,seg_tr_dict)
     pout=DNN2_net(DNN1_net(CNN_net(inp)))
     
     pred=torch.max(pout,dim=1)[1]
@@ -275,7 +283,7 @@ for epoch in range(N_epochs):
      #[fs,signal]=scipy.io.wavfile.read(data_folder+wav_lst_te[i])
      #signal=signal.astype(float)/32768
 
-     [signal, fs] = sf.read(data_folder+wav_lst_te[i])
+     [signal, fs] = sf.read(wav_lst_te[i])
 
      signal=torch.from_numpy(signal).float().cuda().contiguous()
      lab_batch=lab_dict[wav_lst_te[i]]

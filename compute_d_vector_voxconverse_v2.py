@@ -24,9 +24,9 @@ import sys
 
 # Model to use for computing the d-vectors
 # This is the model to use for computing the d-vectors (it should be pre-trained using the speaker-id DNN)
-model_file = '/ciiia/home/ciiiau3/SincNet-alberto/exp/SincNet_TIMIT/model_raw.pkl'
+model_file ='/export/c07/carlosc/albertov/SincNet/exp/SincNet_TIMIT/model_raw.pkl'
 # Config file of the speaker-id experiment used to generate the model
-cfg_file = '/ciiia/home/ciiiau3/SincNet-alberto/cfg/SincNet_voxconverse.cfg'
+cfg_file='/export/c07/carlosc/albertov/SincNet/cfg/SincNet_Voxconverse_512.cfg'
 
 
 te_lst = sys.argv[1]
@@ -165,7 +165,7 @@ overlapped_dict = overlapped_dict.tolist()
 with torch.no_grad():
     for i in range(snt_te):
         name = wav_lst_te[i][-9:-4]
-        print("working",name)
+        #print("working",name)
         
         #for reference
 
@@ -267,13 +267,13 @@ with torch.no_grad():
                 nan_sum = torch.sum(torch.isnan(d_vect_out))
 
                 if nan_sum > 0:
-                    print("nan")
+                    #print("nan")
                     continue
 
                 # saving the d-vector in a numpy dictionary
                 dict_key = str(key)
                 d_vect_dict[dict_key] = d_vect_out.cpu().numpy()
-        print("finish",name)
+        #print("finish",name)
 
 
 
