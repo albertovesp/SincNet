@@ -24,9 +24,9 @@ import numpy as np
 from dnn_models import MLP,flip
 from dnn_models import SincNet as CNN 
 from data_io import ReadList,read_conf,str_to_bool
+import kaldi_io
 
-
-def create_batches_rnd(batch_size,data_folder,wav_lst,N_snt,wlen,lab_dict,fact_amp,seg_tr_dict):
+def create_batches_rnd(batch_size,data_folder,wav_lst,N_snt,wlen,lab_dict,fact_amp,vad_tr_dict):
     
  # Initialization of the minibatch (batch_size,[0=>x_t,1=>x_t+N,1=>random_samp])
  sig_batch=np.zeros([batch_size,wlen])
@@ -41,13 +41,11 @@ def create_batches_rnd(batch_size,data_folder,wav_lst,N_snt,wlen,lab_dict,fact_a
   # select a random sentence from the list 
   #[fs,signal]=scipy.io.wavfile.read(data_folder+wav_lst[snt_id_arr[i]])
   #signal=signal.astype(float)/32768
-  for key in seg_tr_dict.keys():
-   print(wav_lst[0],key)
-
-
-   sys.exit()
+   for key,vec in kaldi_io.read_vec_flt_ark(vad_tr_dict[wav_lst[snt_id_arr[i]]]):
+     vad = vec
    [signal, fs] = sf.read(wav_lst[snt_id_arr[i]])
-
+   
+   signal = signal * vad
    # accesing to a random chunk
    snt_len=signal.shape[0]
    snt_beg=np.random.randint(snt_len-wlen-1) #randint(0, snt_len-2*wlen-1)
@@ -78,8 +76,8 @@ pt_file=options.pt_file
 class_dict_file=options.lab_dict
 data_folder=options.data_folder+'/'
 output_folder=options.output_folder
-seg_tr ="/export/c07/carlosc/albertov/SincNet/data_lists/VoxCeleb/segments_train.npy" 
-seg_te ="/export/c07/carlosc/albertov/SincNet/data_lists/VoxCeleb/segments_test.npy" 
+vad_tr ="/export/c07/carlosc/albertov/SincNet-alberto/data_lists/VoxCeleb/vad_train.npy" 
+vad_te ="/export/c07/carlosc/albertov/SincNet-alberto/data_lists/VoxCeleb/vad_test.npy" 
 
 #[windowing]
 fs=int(options.fs)
@@ -178,8 +176,8 @@ CNN_net.cuda()
 # Loading label dictionary
 print('ok')
 lab_dict=np.load(class_dict_file,allow_pickle=True).item()
-seg_tr_dict=np.load(seg_tr,allow_pickle=True).item()
-seg_te_dict=np.load(seg_te,allow_pickle=True).item()
+vad_tr_dict=np.load(vad_tr,allow_pickle=True).item()
+vad_te_dict=np.load(vad_te,allow_pickle=True).item()
 print('ok2')
 
 
@@ -238,7 +236,7 @@ for epoch in range(N_epochs):
 
   for i in range(N_batches):
 
-    [inp,lab]=create_batches_rnd(batch_size,data_folder,wav_lst_tr,snt_tr,wlen,lab_dict,0.2,seg_tr_dict)
+    [inp,lab]=create_batches_rnd(batch_size,data_folder,wav_lst_tr,snt_tr,wlen,lab_dict,0.2,vad_tr_dict)
     pout=DNN2_net(DNN1_net(CNN_net(inp)))
     
     pred=torch.max(pout,dim=1)[1]
@@ -282,8 +280,11 @@ for epoch in range(N_epochs):
        
      #[fs,signal]=scipy.io.wavfile.read(data_folder+wav_lst_te[i])
      #signal=signal.astype(float)/32768
-
+     for key,vec in kaldi_io.read_vec_flt_ark(vad_te_dict[wav_lst_te[i]]):
+       vad = vec
      [signal, fs] = sf.read(wav_lst_te[i])
+     
+     signal = signal * vad
 
      signal=torch.from_numpy(signal).float().cuda().contiguous()
      lab_batch=lab_dict[wav_lst_te[i]]
