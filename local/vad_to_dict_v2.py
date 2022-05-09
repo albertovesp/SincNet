@@ -14,7 +14,7 @@ def get_args():
   parser = argparse.ArgumentParser(description = '')
   parser.add_argument('vad_file', type = str, help = 'vad.scp file')
   parser.add_argument('wav_file', type = str, help = 'wav file')
-  parser.add_argument('output_file', type = str, help = 'Output VAD dictionary')
+  parser.add_argument('output_path', type = str, help = 'Output VAD dictionary')
   args = parser.parse_args()
   return args
 
@@ -37,14 +37,18 @@ def main():
 
   f.close()
   
-  new_vad_dict = {}
+  i=0
   for key in vad_dict.keys():
+    new_vad_dict = {}
     new_vad = []
     for frame in vad_dict[key]:
       new_vad = np.concatenate((new_vad, [frame]*160), axis=None)
     new_vad = np.concatenate((new_vad, [0]), axis=None)
-    new_vad_dict[wav_dict[key]] = new_vad
-  
-  np.save(args.output_file, new_vad_dict)
+    new_vad_dict[key] = new_vad
+    i+=1
+    with open(args.output_path+'vad_'+str(i)+'.ark','wb') as f:
+      for key in new_vad_dict.keys():
+        kaldi_io.write_vec_flt(f,np.array(new_vad_dict[key],dtype=np.float32), key=key)
+
 if __name__ == '__main__':
   main()

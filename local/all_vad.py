@@ -12,21 +12,17 @@ class Wav_line:
 
 def get_args():
   parser = argparse.ArgumentParser(description = '')
-  parser.add_argument('vad_file', type = str, help = 'vad.scp file')
+  parser.add_argument('vad_path', type = str, help = 'vad folder')
   parser.add_argument('wav_file', type = str, help = 'wav file')
-  parser.add_argument('output_file', type = str, help = 'Output VAD dictionary')
+  parser.add_argument('output_path', type = str, help = 'Output VAD dictionary')
   args = parser.parse_args()
   return args
 
 def main():
   args = get_args()
   
-  if not os.path.isfile(args.vad_file):
-    sys.exit(args.vad_file + ' not found or is not file or ')
-
-  vad_dict = {}
-  for key,vec in kaldi_io.read_vec_flt_scp(args.vad_file):
-    vad_dict[key] = vec
+  if not os.path.isdir(args.vad_path):
+    sys.exit(args.vad_path + ' not found or is not dir')
 
   f = open(args.wav_file,'r')
   wav_dict = {}
@@ -34,17 +30,16 @@ def main():
     wav_line = Wav_line(line)
     if wav_line.audio not in wav_dict:
       wav_dict[wav_line.audio] = wav_line.wav
-
   f.close()
+
   
-  new_vad_dict = {}
-  for key in vad_dict.keys():
-    new_vad = []
-    for frame in vad_dict[key]:
-      new_vad = np.concatenate((new_vad, [frame]*160), axis=None)
-    new_vad = np.concatenate((new_vad, [0]), axis=None)
-    new_vad_dict[wav_dict[key]] = new_vad
-  
-  np.save(args.output_file, new_vad_dict)
+  f_scp = open(args.output_path + '/vad.scp', 'w')
+  for subdir, dirs, files in os.walk(args.vad_path):
+    for file in files:
+      ark_file= args.vad_path+"/"+ file
+      for key,vec in kaldi_io.read_vec_flt_ark(ark_file):
+        print(key + ' ' + os.path.abspath(ark_file) + ':' + str(len(key)+1))
+        f_scp.write(key + ' ' + os.path.abspath(ark_file) + ':' + str(len(key)+1) + '\n')
+  f_scp.close()
 if __name__ == '__main__':
   main()
