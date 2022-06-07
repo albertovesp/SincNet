@@ -18,6 +18,7 @@ class Wav_line:
 def get_args():
   parser = argparse.ArgumentParser(description = '')
   parser.add_argument('wav_file', type = str, help = 'Path to wav file')
+  parser.add_argument('wav2_file', type = str, help = 'Path to wav file')
   parser.add_argument('output_file', type = str, help = 'Path to output file')
   args = parser.parse_args()
   return args
@@ -44,9 +45,19 @@ def main():
       i += 1
     if wav_line.speaker_id not in speaker_dict:
       speaker_dict[wav_line.speaker_id] = numberid_dict[wav_line.name]
-
+  i=0
   f.close()
   output_file.close()
+  f = open(args.wav2_file, 'r')
+  for line in f.readlines():
+    wav_line= Wav_line(line)
+    if wav_line.name not in numberid_dict:
+      numberid_dict[wav_line.name] = i
+      i += 1
+    if wav_line.speaker_id not in speaker_dict:
+      speaker_dict[wav_line.speaker_id] = numberid_dict[wav_line.name]
+  
+  
   np.save("labels.npy",speaker_dict)
 if __name__ == '__main__':
   main()
